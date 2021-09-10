@@ -12,6 +12,12 @@ web3 = Web3(Web3.HTTPProvider("https://mainnet.infura.io/v3/b11919ed73094499a35d
 
 
 @functools.lru_cache()
+def get_blocks_history():
+    gas_stats = get_price_stats()
+    prepared_stats = {block['block']: block['fee'] for block in gas_stats}
+    return gas_stats, prepared_stats
+
+
 def get_price_stats():
     last_block = 'latest'
     gas_prices = []
@@ -64,17 +70,6 @@ def get_percent(prepared_data, curr_block_num, blocks_count, percent):
     return gas_fee[int(len(gas_fee) * percent)]
 
 
-def prepare_analy(block_num, per):
-    stats = get_price_stats()
-
-    prepared_stats = {block['block']: block['fee'] for block in stats}
-
-    for block in stats:
-        block['percent'] = get_percent(prepared_stats, block['block'], block_num, per)
-
-    return stats
-
-
 app = dash.Dash(__name__)
 
 
@@ -102,19 +97,22 @@ app.layout = html.Div([
     [Input("percentile", "value"), Input("blocks_count", "value")]
 )
 def customize_width(percentile, blocks_count):
-    stats = prepare_analy(blocks_count, percentile)
+    gas_stats, prepared_stats = get_blocks_history()
 
     x = []
     y1 = []
     y2 = []
 
-    for index, stat in enumerate(stats):
+    for index, stat in enumerate(gas_stats):
         # Show every 300 block ~ every 1 hour
         # Do not show chart if we dont have enough prev data
-        if index % 300 == 0 and stat['percent'] != 0:
-            x.append(stat['block'])
-            y1.append(stat['fee']/10**9)
-            y2.append(stat['percent']/10**9)
+        if index % 300 == 0:
+            # Not enough prev data
+            percent = get_percent(prepared_stats, stat['block'], blocks_count, percentile)
+            if percent:
+                x.append(stat['block'])
+                y1.append(stat['fee']/10**9)
+                y2.append(percent/10**9)
 
     fig = go.Figure()
     fig.add_trace(
