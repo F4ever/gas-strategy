@@ -14,17 +14,18 @@ web3 = Web3(Web3.HTTPProvider("https://mainnet.infura.io/v3/b11919ed73094499a35d
 def get_price_stats():
     last_block = 'latest'
     gas_prices = []
-    requests_num = 50
 
-    # 2 weeks will be fetched
-    # 45 * 1024 block / 13 seconds = 1 week
+    # 45 * 1024 block / 13 seconds ~ 1 week
+    # 6 * 1024 block / 13 seconds ~ one day
+    requests_num = 12
+
     for i in range(requests_num):
         stats = web3.eth.fee_history(1024, last_block)
         last_block = stats['oldestBlock'] - 2
 
         gas_prices = stats['baseFeePerGas'] + gas_prices
 
-    return gas_prices, list(range(stats['oldestBlock'], stats['oldestBlock'] + (1024 + 1) * requests_num))
+    return [gas_price / 10**9 for gas_price in gas_prices], list(range((1024 + 1) * requests_num))
 
 
 def calc_gas_percentile(gas_prices, block_nums, percentile, block_in_past):
@@ -65,7 +66,7 @@ app.layout = html.Div([
     dcc.Input(
         id='blocks_count',
         type='number',
-        value=1000
+        value=6600
     )
 ])
 
