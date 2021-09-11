@@ -1,5 +1,4 @@
 import functools
-import datetime
 
 import dash
 from dash import html, dcc
@@ -12,62 +11,41 @@ web3 = Web3(Web3.HTTPProvider("https://mainnet.infura.io/v3/b11919ed73094499a35d
 
 
 @functools.lru_cache()
-def get_blocks_history():
-    gas_stats = get_price_stats()
-    prepared_stats = {block['block']: block['fee'] for block in gas_stats}
-    return gas_stats, prepared_stats
-
-
 def get_price_stats():
     last_block = 'latest'
     gas_prices = []
+    requests_num = 50
 
     # 2 weeks will be fetched
     # 45 * 1024 block / 13 seconds = 1 week
-    for i in range(90):
+    for i in range(requests_num):
         stats = web3.eth.fee_history(1024, last_block)
         last_block = stats['oldestBlock'] - 2
 
-        gas_pirce = zip_gas(stats['baseFeePerGas'], stats['oldestBlock'])
-        gas_pirce.reverse()
+        gas_prices = stats['baseFeePerGas'] + gas_prices
 
-        gas_prices.extend(gas_pirce)
-
-    return gas_prices
+    return gas_prices, list(range(stats['oldestBlock'], stats['oldestBlock'] + (1024 + 1) * requests_num))
 
 
-def zip_gas(gas_fees, last_block):
-    current_block = last_block
+def calc_gas_percentile(gas_prices, block_nums, percentile, block_in_past):
+    x, y = [], []
 
-    results = []
-
-    for fee in gas_fees:
-        results.append({
-            'fee': fee,
-            'block': current_block
-        })
-
-        current_block += 1
-
-    return results
-
-
-def get_percent(prepared_data, curr_block_num, blocks_count, percent):
-    gas_fee = []
-
-    for block in range(curr_block_num - blocks_count, curr_block_num):
-        if block < 0:
+    for block_num in block_nums:
+        if block_num - block_nums[0] < block_in_past:
             continue
 
-        if block in prepared_data:
-            gas_fee.append(prepared_data[block])
+        x.append(block_num)
 
-    gas_fee.sort()
+        current_block_position = block_num - block_nums[0]
+        y.append(calc_percentile(gas_prices[current_block_position - block_in_past: current_block_position], percentile))
 
-    if not gas_fee:
-        return 0
+    return x, y
 
-    return gas_fee[int(len(gas_fee) * percent)]
+
+def calc_percentile(values_list, percentile):
+    import numpy as np
+    a = np.array(values_list)
+    return np.percentile(a, percentile)
 
 
 app = dash.Dash(__name__)
@@ -76,18 +54,18 @@ app = dash.Dash(__name__)
 app.layout = html.Div([
     dcc.Graph(id="graph"),
     html.P("Percentile"),
-    dcc.Slider(
+    dcc.Input(
         id='percentile',
+        type='number',
         min=0,
-        max=1,
-        value=0.2,
-        step=0.01
+        max=100,
+        value=20
     ),
     html.P("Block in pass"),
     dcc.Input(
         id='blocks_count',
         type='number',
-        value=4500
+        value=1000
     )
 ])
 
@@ -97,36 +75,24 @@ app.layout = html.Div([
     [Input("percentile", "value"), Input("blocks_count", "value")]
 )
 def customize_width(percentile, blocks_count):
-    gas_stats, prepared_stats = get_blocks_history()
+    gas_prices, block_nums = get_price_stats()
 
-    x = []
-    y1 = []
-    y2 = []
-
-    for index, stat in enumerate(gas_stats):
-        # Show every 300 block ~ every 1 hour
-        # Do not show chart if we dont have enough prev data
-        if index % 300 == 0:
-            # Not enough prev data
-            percent = get_percent(prepared_stats, stat['block'], blocks_count, percentile)
-            if percent:
-                x.append(stat['block'])
-                y1.append(stat['fee']/10**9)
-                y2.append(percent/10**9)
+    x1, y1 = block_nums[blocks_count:], gas_prices[blocks_count:]
+    x2, y2 = calc_gas_percentile(gas_prices, block_nums, percentile, blocks_count)
 
     fig = go.Figure()
     fig.add_trace(
         go.Scatter(
-            x=x,
+            x=x1,
             y=y1,
             name='Current gas price',
-            line=dict(color='firebrick', width=4)
+            line=dict(color='firebrick')
         )
     )
 
     fig.add_trace(
         go.Scatter(
-            x=x,
+            x=x2,
             y=y2,
             name='Recommended price',
             line=dict(color='blue', width=2)
