@@ -1,13 +1,23 @@
-```angular2html
-pip install -r req.txt
+# <img src="https://docs.lido.fi/img/logo.svg" alt="Lido" width="46"/> Gas reccomended price
 
+## Start
+```bash
+pip install -r req.txt
+export INFURA_PROJECT_ID=...
 python main.py
 ```
 
 Go to http://127.0.0.1:8050/
 
-Wait for a 2 minute to download data and prepare chart
+Wait for 2 minutes to download data and prepare chart
+
+## Params
+Days to fetch - How many blocks fetch from mainnet to build chart  
+Percentile (min 0, max 100)  
+Blocks in past - How many previous blocks to use for the percentile  
 
 
-Percentile for 0 to 1 (default 0.2)
-Block in pass - how many prev blocks use to calc percentile
+## Output 
+![Gas chart](./plot_example.png)  
+
+If recommended price is higher than Current gas fee, it's time to deposit keys.
