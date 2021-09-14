@@ -72,25 +72,38 @@ app.layout = html.Div([
         max=100,
         value=20
     ),
-    html.P("Blocks count in past"),
+    html.P("Blocks count in past 1 (blue chart)"),
     dcc.Input(
-        id='blocks_count',
+        id='blocks_count_1',
         type='number',
         # 2 days
-        value=12000
+        value=6600
+    ),
+    html.P("Blocks count in past 2 (green chart)"),
+    dcc.Input(
+        id='blocks_count_2',
+        type='number',
+        # 2 days
+        value=6600 * 4
     )
 ])
 
 
 @app.callback(
     Output("graph", "figure"),
-    [Input("days", "value"), Input("percentile", "value"), Input("blocks_count", "value")]
+    [
+        Input("days", "value"),
+        Input("percentile", "value"),
+        Input("blocks_count_1", "value"),
+        Input("blocks_count_2", "value"),
+    ]
 )
-def customize_width(days, percentile, blocks_count):
+def customize_width(days, percentile, blocks_count_1, blocks_count_2):
     gas_prices, block_nums = get_price_stats(days)
 
-    x1, y1 = block_nums[blocks_count:], gas_prices[blocks_count:]
-    x2, y2 = calc_gas_percentile(gas_prices, block_nums, percentile, blocks_count)
+    x1, y1 = block_nums[blocks_count_2:], gas_prices[blocks_count_2:]
+    x2, y2 = calc_gas_percentile(gas_prices, block_nums, percentile, blocks_count_1)
+    x3, y3 = calc_gas_percentile(gas_prices, block_nums, percentile, blocks_count_2)
 
     fig = go.Figure()
     fig.add_trace(
@@ -106,8 +119,17 @@ def customize_width(days, percentile, blocks_count):
         go.Scatter(
             x=x2,
             y=y2,
-            name='Recommended price',
+            name='Recommended price 1 (default: 1 day)',
             line=dict(color='blue', width=2)
+        )
+    )
+
+    fig.add_trace(
+        go.Scatter(
+            x=x3,
+            y=y3,
+            name='Recommended price 2 (default: 4 days)',
+            line=dict(color='green', width=2)
         )
     )
 
