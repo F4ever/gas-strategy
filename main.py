@@ -101,7 +101,7 @@ app.layout = html.Div([
 def customize_width(days, percentile, blocks_count_1, blocks_count_2):
     gas_prices, block_nums = get_price_stats(days)
 
-    x1, y1 = block_nums[blocks_count_2:], gas_prices[blocks_count_2:]
+    x1, y1 = block_nums, gas_prices
     x2, y2 = calc_gas_percentile(gas_prices, block_nums, percentile, blocks_count_1)
     x3, y3 = calc_gas_percentile(gas_prices, block_nums, percentile, blocks_count_2)
 
