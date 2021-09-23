@@ -33,8 +33,8 @@ def calc_gas_percentile(gas_prices, block_nums, percentile, block_in_past):
 
     for index, block_num in enumerate(block_nums):
         # Count percentile for each 70 block (15 minutes) to increase perf
-        # And for last 100 block
-        if block_num % 70 != 0 and index < len(block_nums) - 100:
+        # And for last 200 block
+        if block_num % 70 != 0 and index < len(block_nums) - 200:
             continue
 
         if block_num - block_nums[0] < block_in_past:
