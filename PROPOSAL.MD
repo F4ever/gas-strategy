@@ -3,18 +3,22 @@
 Hello everyone!
 
 As you know, to keep our stacking protocol working we should deposit keys and ether to deposit contract.
-For now, we don't have any automatic solution, so sometimes we do not deposit keys for few days or more. 
-We also spend quite a lot of gas at not the best prices. (so far we have spent about 86 ethers)
+For now, we don't have any automatic solution.
 
-## Solution
+We propose:
+1. Run and fund bot that will deposit buffered ether to contract.
+2. Make refund to the development team that was pushing ether to contract.
 
-The main idea is to control gas fee and make a deposit when the gas fee is quite low. So we can wait for a good gas fee for several days.
+## Problem
 
-So we need a strategy to calculate recommended fee:
+Ether is placed in buffer, and it must be deposited by calling smart contract. Until now, it was done manually.
+Manual action requires attention, and it is not possible to deposit when gas fee is low.
 
 ## Strategy
 
-One of them is to count the 20 percentile for the previous couple of days.  
+The main idea is to control gas fee and create transaction when the gas fee is quite low.
+
+One of strategy them is to count the 20 percentile for the previous couple of days.  
 We calculate two values:
 - 20 percentile for 1 day
 - 20 percentile for 4 days
@@ -40,11 +44,8 @@ But if the cost of gas will be quite low, then thanks to the 1-day percentile re
 
 ## Implementation
 
-Here is the source of the depositor bot: [Depositor source code](https://github.com/lidofinance/depositor-bot)
+Here is the source for the depositor bot: [Depositor source code](https://github.com/lidofinance/depositor-bot)
 
 ## Compensation
 
-After launching the bot, we must compensate ether for the gas spent to dev team.  
-For now, it equals to 86.16048979433397 ether. Here is [query](https://dune.xyz/queries/162545) in Dune to calculate fee.
-
-Here is dev team wallet's address: `0x48F300bD3C52c7dA6aAbDE4B683dEB27d38B9ABb`.
+[Here](https://dune.xyz/queries/162545) these are the ether calculations that the development team spent to deposit ether.

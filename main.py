@@ -63,7 +63,7 @@ app.layout = html.Div([
         id='days',
         type='number',
         min=0,
-        value=8,
+        value=6,
     ),
     html.P("Percentile"),
     dcc.Input(
@@ -73,18 +73,18 @@ app.layout = html.Div([
         max=100,
         value=20
     ),
-    html.P("Blocks count in past 1 (blue chart)"),
+    html.P("Blocks to calculate (blue chart)"),
     dcc.Input(
         id='blocks_count_1',
         type='number',
         # 2 days
         value=6600
     ),
-    html.P("Blocks count in past 2 (green chart)"),
+    html.P("Block to calculate (green chart)"),
     dcc.Input(
         id='blocks_count_2',
         type='number',
-        # 2 days
+        # 4 days
         value=6600 * 4
     )
 ])
