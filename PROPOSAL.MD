@@ -7,7 +7,7 @@ For now, we don't have any automatic solution.
 
 We propose:
 1. Run and fund bot that will deposit buffered ether to contract.
-2. Make refund to the development team that was pushing ether to contract.
+2. Make refund to the development team that pushed ether to contract.
 
 ## Problem
 
