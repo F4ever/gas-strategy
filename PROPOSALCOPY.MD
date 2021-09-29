@@ -1,20 +1,26 @@
 ## Proposal to use a bot to deposit keys and ether to contract.
 
-As you know, to keep our stacking protocol working we should deposit keys and ether to deposit contract.
-For now, we don't have any automatic solution.
+Users' ether submitted to Lido smart contract is deposited to the Beacon chain staking via depositBufferedEther call on Lido smart contract. 
+This operation requires significant amount of gas, making manual operations not as cost-efficient as possible.  
 
-We propose:
-1. Run and fund bot that will deposit buffered ether to contract.
-2. Make refund to the development team that deposited buffered ether to contract before.
+We propose to run and fund bot that will automate the deposits, 
+implementing smart gas strategy suitable for task's constraints.
+Along with this, we propose refunding dev team for gas spent on deposits so far (86.16 ETH)
 
 ## Problem
 
-Ether is placed in buffer, and it must be deposited by calling smart contract. Until now, it was done manually.
-Manual action requires attention, and we can save money if we deposit while the cost of gas is low.
+Protocol's APR is earned only on deposited ether - having big buffer hurts APR. 
+It requires smart contract interaction to deposit ether. 
+Deposit ether is gas-consuming, making it desirable to choose some form of optimal moment / gas price to:
+1. not overspend;
+2. don't have too much ether in the buffer for too long, hurting the protocol's apr;
 
-## Strategy
+## Proposed solution
 
-The main idea is to control gas fee and create transaction when the gas fee is quite low.
+Write bot that will track gas fee history and deposit buffered ether if conditions are met (gas fee, buffered ether, unused keys).
+
+#### Gas strategy:  
+The main idea is to control gas fee and create transaction when the gas fee is quite low (40 - 50 gwei), 
 
 One of strategy is to count the 20 percentile for the previous couple of days.  
 We calculate two values:
@@ -22,21 +28,21 @@ We calculate two values:
 - 20 percentile for 4 days
 And the minimum of them becomes the recommended fee.
 
-If current fee is lower than recommended fee we submit transactions.
+If current fee is lower than recommended fee we allow submitting deposit transaction.
 
 ## Strategy details
 
-I wrote a small script that looks at historical data and plots charts with recommended price, percentile for 1 day and percentile for 4 days. And got this:  
-
+Chart with 1-day & 4-days 20th percentiles:  
 <img src="https://github.com/F4ever/gas-strategy/blob/master/plot_example.png" alt="Gas fee chart">
   
-You can play with sandbox and change percentile and/or period used to calculate percentile:  
+Script used to build a plot:
 [Gas strategy proposal](https://github.com/F4ever/gas-strategy)
 
 ## Implementation
 
-Here is the source for the depositor bot: [Depositor source code](https://github.com/lidofinance/depositor-bot)
+The proposed bot source code: [Depositor source code](https://github.com/lidofinance/depositor-bot)
 
 ## Compensation
 
-Ether calculations that the development team spent to deposit ether: [https://dune.xyz/queries/162545](https://dune.xyz/queries/162545)
+Total ether spent by dev team on gas: 86.16 ETH.
+Calculations: [https://dune.xyz/queries/162545](https://dune.xyz/queries/162545)
