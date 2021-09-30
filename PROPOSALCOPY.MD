@@ -1,10 +1,9 @@
 ## Proposal to use a bot to deposit keys and ether to contract.
 
-Users' ether submitted to Lido smart contract is deposited to the Beacon chain staking via depositBufferedEther call on Lido smart contract. 
+User's ether submitted to Lido smart contract is deposited to the Beacon chain staking via depositBufferedEther call on Lido smart contract. 
 This operation requires significant amount of gas, making manual operations not as cost-efficient as possible.  
 
-We propose to run and fund bot that will automate the deposits, 
-implementing smart gas strategy suitable for task's constraints.
+We propose to run and fund bot that will automate the deposits, implementing smart gas strategy suitable for task's constraints.
 Along with this, we propose refunding dev team for gas spent on deposits so far (86.16 ETH)
 
 ## Problem
@@ -19,16 +18,17 @@ Deposit ether is gas-consuming, making it desirable to choose some form of optim
 
 Write bot that will track gas fee history and deposit buffered ether if conditions are met (gas fee, buffered ether, unused keys).
 
-#### Gas strategy:  
-The main idea is to control gas fee and create transaction when the gas fee is quite low (40 - 50 gwei), 
+#### Gas strategy:
 
-One of strategy is to count the 20 percentile for the previous couple of days.  
-We calculate two values:
+One of strategy we propose is to count the 20 percentiles for the previous couples of days and use one of them as recommended fee.
+
+Calculate two values:
 - 20 percentile for 1 day
 - 20 percentile for 4 days
+
 And the minimum of them becomes the recommended fee.
 
-If current fee is lower than recommended fee we allow submitting deposit transaction.
+As soon as current fee is lower than recommended fee we allow submitting deposit transaction.
 
 ## Strategy details
 
