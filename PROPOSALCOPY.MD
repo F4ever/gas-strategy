@@ -20,7 +20,7 @@ Implement and deploy a bot which would deposit buffered ether using the specifie
 
 The proposed strategy is to send deposit transactions once the current gas price is below both 1-day 20-th percentile & 4-days 20-th percentile.
 
-## Strategy display
+## Strategy justification
 
 Chart with 1-day & 4-days 20th percentiles (1 week long):  
 <img src="https://github.com/F4ever/gas-strategy/blob/master/plot_example.png" alt="Gas fee chart">
