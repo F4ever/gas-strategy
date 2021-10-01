@@ -1,10 +1,10 @@
-## Proposal to use a bot to deposit keys and ether to contract.
+## Proposal to deploy & fund the bot for depositing buffered ether
 
-User's ether submitted to Lido smart contract is deposited to the Beacon chain staking via depositBufferedEther call on Lido smart contract. 
+User's ether is deposited to the Beacon chain staking via depositBufferedEther call on Lido smart contract. 
 This operation requires significant amount of gas, making manual operations not as cost-efficient as possible.  
 
 We propose to run and fund bot that will automate the deposits, implementing smart gas strategy suitable for task's constraints.
-Along with this, we propose refunding dev team for gas spent on deposits so far (87,814,430,128,333,960,000 WEI; note that the number may have changed)
+Along with this, we propose refunding dev team for gas spent on deposits so far (87.81443012833396 eth)
 
 ## Problem
 
@@ -25,8 +25,8 @@ The proposed strategy is to send deposit transactions once the current gas price
 Chart with 1-day & 4-days 20th percentiles (1 week long):  
 <img src="https://github.com/F4ever/gas-strategy/blob/master/plot_example.png" alt="Gas fee chart">
   
-As you can see 4-day percentile prevents the recommended fee to rise sharply.
-In same time 1-day percentile perfectly counts recommended fee if gas fee goes down.
+4-day percentile prevents the recommended fee to rise sharply.
+In same time 1-day percentile allows to deposit cheaper if the gas fee goes down.
 
 Script used to build a plot:
 [Gas strategy proposal](https://github.com/F4ever/gas-strategy)
@@ -37,5 +37,5 @@ The proposed bot source code: [Depositor source code](https://github.com/lidofin
 
 ## Compensation
 
-Dev team has been running the operation manually and has spent 87.81 ether.
+Dev team has been running the operation manually and has spent 87.81443012833396 eth.
 Calculations: [https://dune.xyz/queries/162545](https://dune.xyz/queries/162545)
