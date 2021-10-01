@@ -25,6 +25,9 @@ The proposed strategy is to send deposit transactions once the current gas price
 Chart with 1-day & 4-days 20th percentiles (1 week long):  
 <img src="https://github.com/F4ever/gas-strategy/blob/master/plot_example.png" alt="Gas fee chart">
   
+As you can see 4-day percentile prevents the recommended fee to rise sharply.
+In same time 1-day percentile perfectly counts recommended fee if gas fee goes down.
+
 Script used to build a plot:
 [Gas strategy proposal](https://github.com/F4ever/gas-strategy)
 
