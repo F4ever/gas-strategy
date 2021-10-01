@@ -4,35 +4,25 @@ User's ether submitted to Lido smart contract is deposited to the Beacon chain s
 This operation requires significant amount of gas, making manual operations not as cost-efficient as possible.  
 
 We propose to run and fund bot that will automate the deposits, implementing smart gas strategy suitable for task's constraints.
-Along with this, we propose refunding dev team for gas spent on deposits so far (86.16 ETH)
+Along with this, we propose refunding dev team for gas spent on deposits so far (87,814,430,128,333,960,000 WEI; note that the number may have changed)
 
 ## Problem
 
-Protocol's APR is earned only on deposited ether - having big buffer hurts APR. 
-It requires smart contract interaction to deposit ether. 
-Deposit ether is gas-consuming, making it desirable to choose some form of optimal moment / gas price to:
-1. not overspend;
-2. don't have too much ether in the buffer for too long, hurting the protocol's apr;
+Protocol's APR is earned only on deposited ether - having big buffer hurts APR.
+Ether is deposited through the smart contract call (depostiBufferedEther on Lido smart contract 0xdcd90c7f6324cfa40d7169ef80b12031770b4325)
+The ether deposit is a gas-intensive operation, so it should be done balancing gas expenses and the time ether sits in protocol buffer.
 
 ## Proposed solution
 
-Write bot that will track gas fee history and deposit buffered ether if conditions are met (gas fee, buffered ether, unused keys).
+Implement and deploy a bot which would deposit buffered ether using the specified gas strategy.
 
 #### Gas strategy:
 
-One of strategy we propose is to count the 20 percentiles for the previous couples of days and use one of them as recommended fee.
+The proposed strategy is to send deposit transactions once the current gas price is below both 1-day 20-th percentile & 4-days 20-th percentile.
 
-Calculate two values:
-- 20 percentile for 1 day
-- 20 percentile for 4 days
+## Strategy display
 
-And the minimum of them becomes the recommended fee.
-
-As soon as current fee is lower than recommended fee we allow submitting deposit transaction.
-
-## Strategy details
-
-Chart with 1-day & 4-days 20th percentiles:  
+Chart with 1-day & 4-days 20th percentiles (1 week long):  
 <img src="https://github.com/F4ever/gas-strategy/blob/master/plot_example.png" alt="Gas fee chart">
   
 Script used to build a plot:
@@ -44,5 +34,5 @@ The proposed bot source code: [Depositor source code](https://github.com/lidofin
 
 ## Compensation
 
-Total ether spent by dev team on gas: 86.16 ETH.
+Dev team has been running the operation manually and has spent 87.81 ether.
 Calculations: [https://dune.xyz/queries/162545](https://dune.xyz/queries/162545)
