@@ -1,4 +1,4 @@
-## Proposal to deploy & fund the bot for depositing buffered ether
+## Proposal to deploy & fund the bot for depositing buffered ether and refund ether spent on gas fee
 
 User's ether is deposited to the Beacon chain staking via depositBufferedEther call on Lido smart contract. 
 This operation requires significant amount of gas, making manual operations not as cost-efficient as possible.  
@@ -25,7 +25,7 @@ The proposed strategy is to send deposit transactions once the current gas price
 Chart with 1-day & 4-days 20th percentiles (1 week long):  
 <img src="https://github.com/F4ever/gas-strategy/blob/master/plot_example.png" alt="Gas fee chart">
   
-4-day percentile prevents the recommended fee to rise sharply.
+A sharp change in gas cost does not instantly affect the 4-day percentile, so recommended price stay low for a couple of days.
 In same time 1-day percentile allows to deposit cheaper if the gas fee goes down.
 
 Script used to build a plot:
