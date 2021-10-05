@@ -10,6 +10,9 @@ import plotly.graph_objects as go
 
 
 INFURA_PROJECT_ID = os.getenv('INFURA_PROJECT_ID')
+if INFURA_PROJECT_ID is None:
+    raise Exception('Provide INFURA_PROJECT_ID in environment')
+
 web3 = Web3(Web3.HTTPProvider(f"https://mainnet.infura.io/v3/{INFURA_PROJECT_ID}"))
 
 
