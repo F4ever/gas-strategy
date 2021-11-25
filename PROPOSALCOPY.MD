@@ -24,6 +24,7 @@ Fund the bot that would deposit buffered ether.
 
 To reduce gas costs we use special gas strategy.
 The strategy is to send deposit transactions once the current gas price is below 2-day 30-th percentile.
+The strategy can be changed in future according to gas fee behaviour.
 
 ## Implementation
 
