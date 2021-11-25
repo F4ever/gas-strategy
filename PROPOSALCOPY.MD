@@ -1,41 +1,35 @@
 ## Proposal to deploy & fund the bot for depositing buffered ether and refund ether spent on gas fee
 
-User's ether is deposited to the Beacon chain staking via depositBufferedEther call on Lido smart contract. 
-This operation requires significant amount of gas, making manual operations not as cost-efficient as possible.  
+User's ether is deposited to the Beacon chain staking via depositBufferedEther call on "DepositSecurityModule" smart contract.
+This operation requires significant amount of gas and is performed by the depositor bot.
 
-We propose to run and fund bot that will automate the deposits, implementing smart gas strategy suitable for task's constraints.
-Along with this, we propose refunding dev team for gas spent on deposits so far (87.81443012833396 eth)
+We propose to fund the depositor bot and refund dev team for gas spent on deposits so far (124.72235422715326 eth)
 
 ## Problem
 
 Protocol's APR is earned only on deposited ether - having big buffer hurts APR.
-Ether is deposited through the smart contract call (depostiBufferedEther on Lido smart contract 0xdcd90c7f6324cfa40d7169ef80b12031770b4325)
-The ether deposit is a gas-intensive operation, so it should be done balancing gas expenses and the time ether sits in protocol buffer.
+
+Ether is deposited through the smart contract call (depostiBufferedEther on DepositSecurityModule smart contract 0xDb149235B6F40dC08810AA69869783Be101790e7),
+using signatures of the guardians.
+
+This is a gas-intensive operation, so it should be done balancing gas expenses and the time ether sits in protocol buffer.
+
+We must periodically replenish the bot's wallet to continue doing deposits.
 
 ## Proposed solution
 
-Implement and deploy a bot which would deposit buffered ether using the specified gas strategy.
+Fund the bot that would deposit buffered ether.
 
-#### Gas strategy:
+#### Gas costs
 
-The proposed strategy is to send deposit transactions once the current gas price is below both 1-day 20-th percentile & 4-days 20-th percentile.
-
-## Strategy justification
-
-Chart with 1-day & 4-days 20th percentiles (1 week long):  
-<img src="https://github.com/F4ever/gas-strategy/blob/master/plot_example.png" alt="Gas fee chart">
-  
-A sharp change in gas cost does not instantly affect the 4-day percentile, so recommended price stay low for a couple of days.
-In same time 1-day percentile allows to deposit cheaper if the gas fee goes down.
-
-Script used to build a plot:
-[Gas strategy proposal](https://github.com/F4ever/gas-strategy)
+To reduce gas costs we use special gas strategy.
+The strategy is to send deposit transactions once the current gas price is below 2-day 30-th percentile.
 
 ## Implementation
 
-The proposed bot source code: [Depositor source code](https://github.com/lidofinance/depositor-bot)
+Deposit bot source code: [Depositor source code](https://github.com/lidofinance/depositor-bot)
 
 ## Compensation
 
-Dev team has been running the operation manually and has spent 87.81443012833396 eth.
-Calculations: [https://dune.xyz/queries/162545](https://dune.xyz/queries/162545)
+Dev team has been spending 124.72235422715326 eth on depositing. (Calculations: [https://dune.xyz/queries/162545](https://dune.xyz/queries/162545))
+And 9.094353815610123000 eth are currently on bot's wallet. (Wallet address 0xB049E2336CACf0bA1f735FB8303c8AAb227B90D2)
